@@ -115,7 +115,7 @@ export default function WordProblem({ content, onResponse, onComplete }: WordPro
         </motion.div>
       )}
 
-      <RewardAnimation show={showReward} type="confetti" />
+      <RewardAnimation show={showReward} level="large" />
     </div>
   );
 }

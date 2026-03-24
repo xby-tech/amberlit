@@ -1,74 +1,60 @@
 'use client';
 
+import { useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import type { Database } from '@/lib/supabase/types';
 import { createClient } from '@/lib/supabase/client';
-import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import NavRail from './NavRail';
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 
-export function AppShell({
-  profile,
-  children,
-}: {
+interface AppShellProps {
   profile: Profile;
   children: React.ReactNode;
-}) {
-  const pathname = usePathname();
+  aidePanel?: React.ReactNode;
+}
+
+export function AppShell({ profile, children, aidePanel }: AppShellProps) {
   const router = useRouter();
   const supabase = createClient();
+  const [aidePanelOpen, setAidePanelOpen] = useState(false);
 
-  async function handleSignOut() {
+  const handleSignOut = useCallback(async () => {
     await supabase.auth.signOut();
     router.push('/');
-  }
-
-  const navItems = [
-    { href: '/app/dashboard', label: 'Dashboard' },
-    { href: '/app/settings', label: 'Settings' },
-  ];
+  }, [supabase, router]);
 
   return (
-    <div className="flex min-h-full flex-col">
-      <header className="border-b border-amber-100 bg-white">
-        <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4">
-          <div className="flex items-center gap-6">
-            <Link
-              href="/app/dashboard"
-              className="text-lg font-bold text-amber-700"
-            >
-              AmberLit
-            </Link>
-            <nav className="hidden gap-4 sm:flex">
-              {navItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`text-sm font-medium ${
-                    pathname === item.href
-                      ? 'text-amber-700'
-                      : 'text-gray-500 hover:text-gray-700'
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
-          </div>
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-500">
-              {profile.display_name}
+    <div className="flex h-full min-h-screen">
+      {/* Left nav rail (64px on lg+) */}
+      <NavRail onSignOut={handleSignOut} />
+
+      {/* Main content area */}
+      <main className="flex-1 min-w-0 pb-16 lg:pb-0 overflow-y-auto">
+        {children}
+      </main>
+
+      {/* Collapsible right aide panel (desktop only) */}
+      {aidePanel && (
+        <>
+          <button
+            type="button"
+            onClick={() => setAidePanelOpen(!aidePanelOpen)}
+            className="hidden lg:flex items-center justify-center w-6 bg-stone-100 border-l border-stone-200 hover:bg-stone-200 transition-colors"
+            aria-label={aidePanelOpen ? 'Close aide panel' : 'Open aide panel'}
+          >
+            <span className="text-stone-500 text-xs">
+              {aidePanelOpen ? '\u203A' : '\u2039'}
             </span>
-            <button
-              onClick={handleSignOut}
-              className="text-sm font-medium text-gray-500 hover:text-gray-700"
-            >
-              Sign out
-            </button>
-          </div>
-        </div>
-      </header>
-      <main className="flex-1">{children}</main>
+          </button>
+
+          {aidePanelOpen && (
+            <aside className="hidden lg:block w-80 border-l border-stone-200 bg-white overflow-y-auto shrink-0">
+              {aidePanel}
+            </aside>
+          )}
+        </>
+      )}
     </div>
   );
 }

@@ -1,88 +1,119 @@
 'use client';
 
+import { useCallback, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { Check, HelpCircle, X } from 'lucide-react';
 import type { ResponseResult } from '@/lib/supabase/types';
 
 interface ResponseRecorderProps {
   onRecord: (result: ResponseResult) => void;
-  showPrompted?: boolean;
-  showSkip?: boolean;
+  aideMode?: boolean;
   disabled?: boolean;
 }
 
 export default function ResponseRecorder({
   onRecord,
-  showPrompted = true,
-  showSkip = true,
+  aideMode = false,
   disabled = false,
 }: ResponseRecorderProps) {
+  // Keyboard shortcuts in aide mode: 1=correct, 2=prompted, 3=incorrect
+  useEffect(() => {
+    if (!aideMode || disabled) return;
+
+    function handleKey(e: KeyboardEvent) {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      switch (e.key) {
+        case '1':
+          onRecord('correct');
+          break;
+        case '2':
+          onRecord('prompted');
+          break;
+        case '3':
+          onRecord('incorrect');
+          break;
+      }
+    }
+
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [aideMode, disabled, onRecord]);
+
   return (
-    <div className="flex items-center gap-3 py-4">
-      <RecordButton
+    <div className="flex items-center gap-3 py-4" role="group" aria-label="Response recorder">
+      {/* Correct - largest */}
+      <ResponseButton
         label="Correct"
-        emoji="✓"
-        color="bg-green-500 hover:bg-green-600"
+        shortcut={aideMode ? '1' : undefined}
+        icon={<Check className="w-5 h-5" />}
+        className="bg-eucalyptus-500 hover:bg-eucalyptus-600 text-white flex-[2]"
         onClick={() => onRecord('correct')}
         disabled={disabled}
       />
-      <RecordButton
+
+      {/* Prompted - medium */}
+      <ResponseButton
+        label="Prompted"
+        shortcut={aideMode ? '2' : undefined}
+        icon={<HelpCircle className="w-5 h-5" />}
+        className="bg-brand-500 hover:bg-brand-600 text-white flex-[1.5]"
+        onClick={() => onRecord('prompted')}
+        disabled={disabled}
+      />
+
+      {/* Incorrect - smallest */}
+      <ResponseButton
         label="Incorrect"
-        emoji="✗"
-        color="bg-red-500 hover:bg-red-600"
+        shortcut={aideMode ? '3' : undefined}
+        icon={<X className="w-5 h-5" />}
+        className="bg-red-400 hover:bg-red-500 text-white flex-1"
         onClick={() => onRecord('incorrect')}
         disabled={disabled}
       />
-      {showPrompted && (
-        <RecordButton
-          label="Prompted"
-          emoji="?"
-          color="bg-amber-500 hover:bg-amber-600"
-          onClick={() => onRecord('prompted')}
-          disabled={disabled}
-        />
-      )}
-      {showSkip && (
-        <RecordButton
-          label="Skip"
-          emoji="→"
-          color="bg-gray-400 hover:bg-gray-500"
-          onClick={() => onRecord('skipped')}
-          disabled={disabled}
-        />
-      )}
     </div>
   );
 }
 
-function RecordButton({
+function ResponseButton({
   label,
-  emoji,
-  color,
+  shortcut,
+  icon,
+  className,
   onClick,
   disabled,
 }: {
   label: string;
-  emoji: string;
-  color: string;
+  shortcut?: string;
+  icon: React.ReactNode;
+  className: string;
   onClick: () => void;
   disabled: boolean;
 }) {
+  const handleClick = useCallback(() => {
+    if (!disabled) onClick();
+  }, [disabled, onClick]);
+
   return (
     <motion.button
       type="button"
-      onClick={onClick}
+      onClick={handleClick}
       disabled={disabled}
       className={`
-        ${color} text-white
-        px-5 py-3 rounded-xl font-semibold text-sm
-        flex items-center gap-2
+        ${className}
+        min-h-[48px] px-4 py-3 rounded-button font-semibold text-adult-base
+        flex items-center justify-center gap-2
         disabled:opacity-50 disabled:cursor-not-allowed
-        transition-colors shadow-sm
+        transition-colors shadow-button
       `}
       whileTap={!disabled ? { scale: 0.95 } : undefined}
     >
-      <span className="text-lg">{emoji}</span>
-      {label}
+      {icon}
+      <span>{label}</span>
+      {shortcut && (
+        <kbd className="ml-1 text-xs opacity-70 bg-white/20 rounded px-1.5 py-0.5">
+          {shortcut}
+        </kbd>
+      )}
     </motion.button>
   );
 }

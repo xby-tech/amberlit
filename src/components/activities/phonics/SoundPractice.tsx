@@ -69,7 +69,7 @@ export default function SoundPractice({ content, onResponse, onComplete }: Sound
       </AnimatePresence>
 
       {/* Response buttons */}
-      <ResponseRecorder onRecord={handleRecord} showSkip={false} />
+      <ResponseRecorder onRecord={handleRecord} />
 
       <RewardAnimation show={showReward} />
     </div>

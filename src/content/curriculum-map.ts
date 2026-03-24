@@ -148,7 +148,7 @@ function buildMathsNodes(): CurriculumNode[] {
       content: {
         type: 'maths_concept',
         conceptId: unit.id,
-        visual: unit.strand === 'number' ? 'ten_frame' : unit.strand === 'space' ? 'shapes' : 'counters',
+        visual: unit.strand === 'number' ? 'ten_frame' : unit.strand === 'space' ? 'shape_explorer' : 'part_part_whole',
         steps: unit.skills.map((s) => s.replace(/_/g, ' ')),
       },
       aiEnhanced: false,
@@ -296,8 +296,7 @@ function buildScienceNodes(): CurriculumNode[] {
       domain: 'science',
       strand: unit.strand,
       title: unit.title,
-      description: `${unit.title} (${unit.acDescriptor})`,
-      acContentDescriptor: unit.acDescriptor,
+      description: unit.content,
       prerequisites: prevId ? [prevId] : [],
       masteryThreshold: 0.7,
       estimatedMinutes: 10,
@@ -341,20 +340,20 @@ function buildDigitalNodes(): CurriculumNode[] {
       aiEnhanced: false,
     });
 
-    // Pattern finding activity (if patterns available)
-    if (unit.patterns.length > 0) {
+    // Vocabulary activity
+    if (unit.vocabulary.length > 0) {
       activities.push({
-        id: `${unit.id}.patterns`,
+        id: `${unit.id}.vocab`,
         type: 'digital_activity',
-        title: `Patterns: ${unit.title}`,
+        title: `Vocabulary: ${unit.title}`,
         instructions: {
-          parent: `Help your child find the pattern and predict what comes next.`,
-          aide: `Pattern recognition activity. Students identify repeating patterns and predict the next element.`,
+          parent: `Help your child learn these digital technology words.`,
+          aide: `Vocabulary activity. Discuss each term and its meaning.`,
         },
         content: {
           type: 'digital_activity',
-          activityId: `${unit.id}.patterns`,
-          instructions: unit.patterns.map((p, i) => `Pattern ${i + 1}: ${p.sequence.join(' ')} → ?`),
+          activityId: `${unit.id}.vocab`,
+          instructions: unit.vocabulary.map((v) => `Learn about: ${v}`),
         },
         aiEnhanced: false,
       });
@@ -366,8 +365,7 @@ function buildDigitalNodes(): CurriculumNode[] {
       domain: 'digital',
       strand: unit.strand,
       title: unit.title,
-      description: `${unit.title} (${unit.acDescriptor})`,
-      acContentDescriptor: unit.acDescriptor,
+      description: unit.content,
       prerequisites: prevId ? [prevId] : [],
       masteryThreshold: 0.7,
       estimatedMinutes: 8,

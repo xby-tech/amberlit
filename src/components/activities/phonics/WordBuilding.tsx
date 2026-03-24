@@ -125,8 +125,8 @@ export default function WordBuilding({ content, onResponse, onComplete }: WordBu
             key={`${letter}-${i}`}
             letter={letter}
             size="md"
-            variant={feedback ? 'disabled' : 'default'}
-            onClick={() => handleLetterTap(letter)}
+            state={feedback ? 'disabled' : 'default'}
+            onTap={() => handleLetterTap(letter)}
           />
         ))}
       </div>

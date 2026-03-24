@@ -13,22 +13,63 @@ export interface TrickyWordSet {
 
 export const TRICKY_WORDS: Record<YearLevel, TrickyWordSet> = {
   F: {
-    term1: ['I', 'the', 'to', 'no', 'go', 'is', 'my', 'a'],
-    term2: ['he', 'she', 'we', 'me', 'be', 'was', 'you', 'they', 'are', 'all', 'her'],
-    term3: ['said', 'have', 'like', 'so', 'do', 'some', 'come', 'were', 'there', 'little', 'one'],
-    term4: ['when', 'what', 'out', 'could', 'would', 'should', 'their', 'people', 'oh', 'Mr', 'Mrs'],
+    term1: [
+      'I', 'the', 'to', 'no', 'go', 'is', 'my', 'a',
+      'of', 'was', 'has', 'his', 'her', 'put',
+    ],
+    term2: [
+      'he', 'she', 'we', 'me', 'be', 'you', 'they', 'are', 'all',
+      'said', 'have', 'like', 'so', 'do', 'some', 'come',
+      'were', 'there', 'little', 'one', 'into',
+    ],
+    term3: [
+      'when', 'what', 'out', 'could', 'would', 'should',
+      'their', 'people', 'oh', 'Mr', 'Mrs',
+      'here', 'where', 'love', 'give', 'live',
+      'only', 'very', 'want', 'water', 'other',
+    ],
+    term4: [
+      'who', 'why', 'how', 'down', 'now',
+      'been', 'first', 'looked', 'called', 'asked',
+      'made', 'more', 'before', 'after', 'over',
+      'many', 'any', 'two', 'day', 'time',
+    ],
   },
   '1': {
-    term1: ['asked', 'called', 'could', 'looked', 'where', 'who', 'again', 'thought'],
-    term2: ['through', 'many', 'laughed', 'because', 'different', 'any', 'eyes', 'friends'],
-    term3: ['once', 'please', 'turned', 'great', 'every', 'know', 'write', 'right'],
-    term4: ['brought', 'caught', 'bought', 'eight', 'weight', 'weird', 'ceiling', 'receive'],
+    term1: [
+      'asked', 'called', 'could', 'looked', 'where', 'who', 'again', 'thought',
+      'your', 'work', 'does', 'gone', 'once', 'upon', 'always', 'also',
+    ],
+    term2: [
+      'through', 'many', 'laughed', 'because', 'different', 'any', 'eyes', 'friends',
+      'even', 'every', 'might', 'never', 'knew', 'above', 'around', 'between',
+    ],
+    term3: [
+      'once', 'please', 'turned', 'great', 'every', 'know', 'write', 'right',
+      'change', 'another', 'school', 'children', 'talk', 'walk', 'answer', 'learn',
+    ],
+    term4: [
+      'brought', 'caught', 'bought', 'eight', 'weight', 'weird', 'ceiling', 'receive',
+      'believe', 'enough', 'often', 'although', 'beautiful', 'behind', 'build', 'busy',
+    ],
   },
   '2': {
-    term1: ['island', 'answer', 'beautiful', 'continue', 'describe', 'enough', 'guard', 'heard'],
-    term2: ['imagine', 'knowledge', 'library', 'material', 'noticed', 'occasion', 'perhaps', 'question'],
-    term3: ['recent', 'sentence', 'separate', 'special', 'strength', 'suppose', 'surprise', 'though'],
-    term4: ['through', 'tomorrow', 'various', 'weight', 'whether', 'women', 'accident', 'believe'],
+    term1: [
+      'island', 'answer', 'beautiful', 'continue', 'describe', 'enough', 'guard', 'heard',
+      'certain', 'circle', 'decide', 'earth', 'early', 'famous', 'group', 'hour',
+    ],
+    term2: [
+      'imagine', 'knowledge', 'library', 'material', 'noticed', 'occasion', 'perhaps', 'question',
+      'language', 'minute', 'natural', 'opposite', 'particular', 'possible', 'pressure', 'promise',
+    ],
+    term3: [
+      'recent', 'sentence', 'separate', 'special', 'strength', 'suppose', 'surprise', 'though',
+      'reign', 'rhythm', 'scene', 'science', 'straight', 'surface', 'tongue', 'trouble',
+    ],
+    term4: [
+      'through', 'tomorrow', 'various', 'weight', 'whether', 'women', 'accident', 'believe',
+      'breathe', 'business', 'calendar', 'caught', 'century', 'disappear', 'favourite', 'February',
+    ],
   },
 };
 

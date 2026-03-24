@@ -93,7 +93,7 @@ export default function SentenceBuilder({ content, onResponse, onComplete }: Sen
         )}
       </div>
 
-      <RewardAnimation show={showReward} type="confetti" />
+      <RewardAnimation show={showReward} level="large" />
     </div>
   );
 }

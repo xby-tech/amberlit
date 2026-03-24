@@ -23,15 +23,36 @@ export type ActivityType =
   | 'tricky_word_flash'
   | 'decodable_reading'
   | 'spelling_dictation'
-  | 'writing_prompt'
+  | 'comprehension_conversation'
   | 'maths_fluency'
-  | 'maths_concept'
   | 'maths_word_problem'
+  | 'maths_concept'
   | 'science_explore'
   | 'science_investigate'
   | 'digital_activity'
-  | 'comprehension_conversation'
+  | 'writing_prompt'
   | 'oral_language';
+
+// ─── Concept & Digital Variants ──────────────────────────────────────────────
+
+export type ConceptVariant =
+  | 'number_line'
+  | 'ten_frame'
+  | 'part_part_whole'
+  | 'shape_explorer'
+  | 'balance_scale'
+  | 'fraction_model'
+  | 'clock'
+  | 'ruler'
+  | 'thermometer'
+  | 'grid';
+
+export type DigitalVariant =
+  | 'algorithm_builder'
+  | 'pattern_finder'
+  | 'data_collection'
+  | 'grid_navigation'
+  | 'visual_code';
 
 // ─── Curriculum Node ─────────────────────────────────────────────────────────
 
@@ -148,7 +169,7 @@ export interface WritingPromptContent {
 
 export interface MathsFluencyContent {
   type: 'maths_fluency';
-  operation: 'addition' | 'subtraction' | 'multiplication';
+  operation: 'addition' | 'subtraction' | 'multiplication' | 'division';
   /** [a, b] pairs */
   facts: [number, number][];
   /** Target seconds per fact for automaticity */
@@ -159,13 +180,13 @@ export interface MathsConceptContent {
   type: 'maths_concept';
   conceptId: string;
   /** Visual representation type */
-  visual: 'number_line' | 'ten_frame' | 'counters' | 'shapes' | 'bar_model';
+  visual: ConceptVariant;
   steps: string[];
 }
 
 export interface MathsWordProblemContent {
   type: 'maths_word_problem';
-  operation: 'addition' | 'subtraction' | 'multiplication';
+  operation: 'addition' | 'subtraction' | 'multiplication' | 'division';
   numberRange: [number, number];
   /** Fallback problem if AI is unavailable */
   fallbackProblem?: { problem: string; answer: number; working: string };
@@ -187,6 +208,7 @@ export interface ScienceInvestigateContent {
 export interface DigitalActivityContent {
   type: 'digital_activity';
   activityId: string;
+  variant?: DigitalVariant;
   instructions: string[];
 }
 
@@ -221,9 +243,11 @@ export interface AssessmentCriteria {
 
 export interface PhonicsUnit {
   id: string;
+  yearLevel?: YearLevel;
   grapheme?: string;
   phoneme?: string;
   keywords?: string[];
+  decodableWords?: string[];
   week: number;
   /** For blend units */
   blends?: 'initial' | 'final';
@@ -234,11 +258,48 @@ export interface PhonicsUnit {
 
 export interface MathsUnit {
   id: string;
+  yearLevel?: YearLevel;
   strand: MathsStrand;
   title: string;
   skills: string[];
   acDescriptor: string;
   week: number;
+  activities?: ActivityType[];
+  prerequisites?: string[];
+}
+
+// ─── Science-specific types ──────────────────────────────────────────────────
+
+export interface ScienceUnit {
+  id: string;
+  yearLevel: YearLevel;
+  strand: ScienceStrand;
+  title: string;
+  term: number;
+  content: string;
+  inquiryPrompts: string[];
+  sortingItems?: string[];
+  activities: ActivityType[];
+  observationPrompts: string[];
+  investigationQuestions: string[];
+  investigationSteps: string[];
+  recordingPrompts: string[];
+  vocabulary: string[];
+}
+
+// ─── Digital-specific types ──────────────────────────────────────────────────
+
+export interface DigitalUnit {
+  id: string;
+  yearLevel: YearLevel;
+  strand: DigitalStrand;
+  title: string;
+  term: number;
+  content: string;
+  activities: ActivityType[];
+  variant: DigitalVariant;
+  instructions: string[];
+  vocabulary: string[];
 }
 
 // ─── Lesson Assembly ─────────────────────────────────────────────────────────
@@ -247,6 +308,8 @@ export interface AssembledLesson {
   id: string;
   studentId: string;
   yearLevel: YearLevel;
+  /** Day in the rotation cycle (1-5) */
+  dayInCycle?: number;
   warmup: Activity[];
   newContent: Activity[];
   practice: Activity[];

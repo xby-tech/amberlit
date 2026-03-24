@@ -172,7 +172,7 @@ export default function FactFluency({ content, onResponse, onComplete }: FactFlu
         </button>
       </div>
 
-      <RewardAnimation show={showReward} type="confetti" />
+      <RewardAnimation show={showReward} level="large" />
     </div>
   );
 }

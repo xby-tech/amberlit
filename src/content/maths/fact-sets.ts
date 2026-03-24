@@ -81,6 +81,23 @@ export const MULTIPLICATION_FACTS: Record<string, FactPair[]> = {
   ],
 };
 
+// ─── Division Facts (Year 2 introduction) ────────────────────────────────────
+
+export const DIVISION_FACTS: Record<string, FactPair[]> = {
+  '2s': [
+    [2, 1], [4, 2], [6, 3], [8, 4], [10, 5],
+    [12, 6], [14, 7], [16, 8], [18, 9], [20, 10],
+  ],
+  '5s': [
+    [5, 1], [10, 2], [15, 3], [20, 4], [25, 5],
+    [30, 6], [35, 7], [40, 8], [45, 9], [50, 10],
+  ],
+  '10s': [
+    [10, 1], [20, 2], [30, 3], [40, 4], [50, 5],
+    [60, 6], [70, 7], [80, 8], [90, 9], [100, 10],
+  ],
+};
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 /** Get a random subset of facts for a drill */
@@ -90,10 +107,11 @@ export function getRandomFacts(facts: FactPair[], count: number): FactPair[] {
 }
 
 /** Get the answer for a fact pair given an operation */
-export function getFactAnswer(pair: FactPair, operation: 'addition' | 'subtraction' | 'multiplication'): number {
+export function getFactAnswer(pair: FactPair, operation: 'addition' | 'subtraction' | 'multiplication' | 'division'): number {
   switch (operation) {
     case 'addition': return pair[0] + pair[1];
     case 'subtraction': return pair[0] - pair[1];
     case 'multiplication': return pair[0] * pair[1];
+    case 'division': return pair[1] !== 0 ? pair[0] / pair[1] : 0;
   }
 }
