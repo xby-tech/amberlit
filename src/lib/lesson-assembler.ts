@@ -103,14 +103,19 @@ function getReviewQueue(progress: StudentProgressRecord[]): StudentProgressRecor
 /**
  * Get the next new nodes the student should learn.
  * These are unlocked but not yet mastered nodes.
+ * Picks across all 4 domains to ensure variety.
  */
 function getNextNewNodes(
   allNodes: CurriculumNode[],
   progress: StudentProgressRecord[],
 ): CurriculumNode[] {
-  const newNodes: CurriculumNode[] = [];
+  // Collect one candidate per domain
+  const domainCandidates = new Map<string, CurriculumNode>();
 
   for (const node of allNodes) {
+    // Already have a candidate for this domain? Skip.
+    if (domainCandidates.has(node.domain)) continue;
+
     const prog = progress.find((p) => p.curriculum_node_id === node.id);
 
     // Skip mastered nodes
@@ -131,14 +136,14 @@ function getNextNewNodes(
     );
 
     if (isUnlocked) {
-      newNodes.push(node);
+      domainCandidates.set(node.domain, node);
     }
 
-    // Only need 2-3 new nodes
-    if (newNodes.length >= 3) break;
+    // Stop once we have candidates from all 4 domains (or checked everything)
+    if (domainCandidates.size >= 4) break;
   }
 
-  return newNodes;
+  return Array.from(domainCandidates.values());
 }
 
 /**
@@ -199,26 +204,22 @@ function selectNewContentActivities(
   if (targetMinutes <= 0 || nextNodes.length === 0) return [];
 
   const activities: Activity[] = [];
-  let minutes = 0;
 
+  // First pass: one intro activity per domain (ensures all domains represented)
   for (const node of nextNodes) {
-    if (minutes >= targetMinutes) break;
-
-    // Add introduction activity first
-    const intro = node.activities.find(
-      (a) => a.type === 'sound_introduction' || a.type === 'maths_concept',
-    );
+    const intro = node.activities[0]; // first activity is always the intro/explore
     if (intro) {
       activities.push(intro);
-      minutes += 3;
     }
+  }
 
-    // Then add a practice activity
-    const practice = node.activities.find(
-      (a) => a.type === 'sound_practice' || a.type === 'maths_fluency' || a.type === 'word_building',
-    );
-    if (practice && minutes < targetMinutes) {
-      activities.push(practice);
+  // Second pass: add follow-up activities if time allows
+  let minutes = activities.length * 3; // ~3 min per intro
+  for (const node of nextNodes) {
+    if (minutes >= targetMinutes) break;
+    const followUp = node.activities[1]; // second activity
+    if (followUp) {
+      activities.push(followUp);
       minutes += 3;
     }
   }

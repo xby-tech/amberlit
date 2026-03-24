@@ -16,10 +16,17 @@ export async function POST(request: Request) {
 
   const result = calculatePlacementResult(state.literacy, state.maths, yearLevel);
 
-  // Initialize student progress with unlocked starting nodes
+  // Initialize student progress with unlocked starting nodes for ALL 4 domains
+  const prefix = yearLevel === 'F' ? 'F' : yearLevel;
   const progressRows = [
+    // Literacy
     { student_id: studentId, curriculum_node_id: result.literacy.phonicsStartNode, domain: 'literacy', strand: 'phonics', unlocked: true },
+    // Maths
     { student_id: studentId, curriculum_node_id: result.maths.startNode, domain: 'maths', strand: 'number', unlocked: true },
+    // Science — start at first unit for this year level
+    { student_id: studentId, curriculum_node_id: `${prefix}.science.bio.01`, domain: 'science', strand: 'biological', unlocked: true },
+    // Digital Technologies — start at first unit for this year level
+    { student_id: studentId, curriculum_node_id: `${prefix}.digital.algo.01`, domain: 'digital', strand: 'algorithms', unlocked: true },
   ];
 
   await supabase.from('student_progress').upsert(progressRows, { onConflict: 'student_id,curriculum_node_id' });
