@@ -3,6 +3,7 @@
 
 import type { AIProvider } from '@/types/ai';
 import { ClaudeProvider } from './claude';
+import { GrokProvider } from './grok';
 import { MockProvider } from './mock';
 
 export function getAIProvider(): AIProvider {
@@ -11,6 +12,8 @@ export function getAIProvider(): AIProvider {
   switch (provider) {
     case 'claude':
       return new ClaudeProvider();
+    case 'grok':
+      return new GrokProvider();
     case 'mock':
       return new MockProvider();
     default:
