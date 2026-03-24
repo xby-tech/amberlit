@@ -9,6 +9,8 @@ import { WORD_LISTS } from './literacy/word-lists';
 import { TRICKY_WORDS } from './literacy/tricky-words';
 import { MATHS_SEQUENCE } from './maths/maths-sequence';
 import { ADDITION_FACTS, SUBTRACTION_FACTS } from './maths/fact-sets';
+import { SCIENCE_SEQUENCE } from './science/science-sequence';
+import { DIGITAL_SEQUENCE } from './digital/digital-sequence';
 
 // ─── Default assessment criteria ─────────────────────────────────────────────
 
@@ -236,6 +238,145 @@ function buildMathsNodes(): CurriculumNode[] {
   });
 }
 
+// ─── Build Science Curriculum Nodes ───────────────────────────────────────────
+
+const DEFAULT_SCIENCE_CRITERIA: AssessmentCriteria = {
+  minimumAttempts: 3,
+  accuracyThreshold: 0.7,
+  consistencyWindow: 2,
+};
+
+function buildScienceNodes(): CurriculumNode[] {
+  return SCIENCE_SEQUENCE.map((unit, index) => {
+    const yearLevel = unit.id.startsWith('F') ? 'F' : unit.id.startsWith('1') ? '1' : '2';
+    const sameYearUnits = SCIENCE_SEQUENCE.filter((u) => u.id.startsWith(yearLevel === 'F' ? 'F.' : `${yearLevel}.`));
+    const unitIndex = sameYearUnits.indexOf(unit);
+    const prevId = unitIndex > 0 ? sameYearUnits[unitIndex - 1].id : undefined;
+
+    const activities: Activity[] = [];
+
+    // Observation activity
+    activities.push({
+      id: `${unit.id}.observe`,
+      type: 'science_explore',
+      title: `Explore: ${unit.title}`,
+      instructions: {
+        parent: `Help your child observe and describe what they see. Use the prompts to guide discussion.`,
+        aide: `Guided observation activity for ${unit.title}. Use prompts to scaffold student thinking. Record observations.`,
+      },
+      content: {
+        type: 'science_explore',
+        topic: unit.title,
+        observationPrompts: unit.observationPrompts,
+      },
+      aiEnhanced: false,
+    });
+
+    // Investigation activity
+    activities.push({
+      id: `${unit.id}.investigate`,
+      type: 'science_investigate',
+      title: `Investigate: ${unit.title}`,
+      instructions: {
+        parent: `Follow the steps with your child to investigate ${unit.title.toLowerCase()}.`,
+        aide: `Guided investigation. Students follow steps, record findings, and discuss results.`,
+      },
+      content: {
+        type: 'science_investigate',
+        question: unit.investigationQuestions[0],
+        steps: unit.investigationSteps,
+        recordingPrompts: unit.recordingPrompts,
+      },
+      aiEnhanced: false,
+    });
+
+    return {
+      id: unit.id,
+      yearLevel: yearLevel as YearLevel,
+      domain: 'science',
+      strand: unit.strand,
+      title: unit.title,
+      description: `${unit.title} (${unit.acDescriptor})`,
+      acContentDescriptor: unit.acDescriptor,
+      prerequisites: prevId ? [prevId] : [],
+      masteryThreshold: 0.7,
+      estimatedMinutes: 10,
+      activities,
+      assessmentCriteria: DEFAULT_SCIENCE_CRITERIA,
+    };
+  });
+}
+
+// ─── Build Digital Technologies Curriculum Nodes ─────────────────────────────
+
+const DEFAULT_DIGITAL_CRITERIA: AssessmentCriteria = {
+  minimumAttempts: 3,
+  accuracyThreshold: 0.7,
+  consistencyWindow: 2,
+};
+
+function buildDigitalNodes(): CurriculumNode[] {
+  return DIGITAL_SEQUENCE.map((unit, index) => {
+    const yearLevel = unit.id.startsWith('F') ? 'F' : unit.id.startsWith('1') ? '1' : '2';
+    const sameYearUnits = DIGITAL_SEQUENCE.filter((u) => u.id.startsWith(yearLevel === 'F' ? 'F.' : `${yearLevel}.`));
+    const unitIndex = sameYearUnits.indexOf(unit);
+    const prevId = unitIndex > 0 ? sameYearUnits[unitIndex - 1].id : undefined;
+
+    const activities: Activity[] = [];
+
+    // Algorithm builder activity
+    activities.push({
+      id: `${unit.id}.algorithm`,
+      type: 'digital_activity',
+      title: unit.title,
+      instructions: {
+        parent: `Work through the steps with your child. Help them understand the order matters.`,
+        aide: `Algorithm activity: ${unit.title}. Guide students through step-by-step instructions. Discuss sequencing.`,
+      },
+      content: {
+        type: 'digital_activity',
+        activityId: unit.id,
+        instructions: unit.instructions,
+      },
+      aiEnhanced: false,
+    });
+
+    // Pattern finding activity (if patterns available)
+    if (unit.patterns.length > 0) {
+      activities.push({
+        id: `${unit.id}.patterns`,
+        type: 'digital_activity',
+        title: `Patterns: ${unit.title}`,
+        instructions: {
+          parent: `Help your child find the pattern and predict what comes next.`,
+          aide: `Pattern recognition activity. Students identify repeating patterns and predict the next element.`,
+        },
+        content: {
+          type: 'digital_activity',
+          activityId: `${unit.id}.patterns`,
+          instructions: unit.patterns.map((p, i) => `Pattern ${i + 1}: ${p.sequence.join(' ')} → ?`),
+        },
+        aiEnhanced: false,
+      });
+    }
+
+    return {
+      id: unit.id,
+      yearLevel: yearLevel as YearLevel,
+      domain: 'digital',
+      strand: unit.strand,
+      title: unit.title,
+      description: `${unit.title} (${unit.acDescriptor})`,
+      acContentDescriptor: unit.acDescriptor,
+      prerequisites: prevId ? [prevId] : [],
+      masteryThreshold: 0.7,
+      estimatedMinutes: 8,
+      activities,
+      assessmentCriteria: DEFAULT_DIGITAL_CRITERIA,
+    };
+  });
+}
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function findBestWordListKey(unitId: string): string | undefined {
@@ -260,7 +401,7 @@ let _allNodes: CurriculumNode[] | null = null;
 /** Get all curriculum nodes (cached after first call) */
 export function getAllCurriculumNodes(): CurriculumNode[] {
   if (!_allNodes) {
-    _allNodes = [...buildPhonicsNodes(), ...buildMathsNodes()];
+    _allNodes = [...buildPhonicsNodes(), ...buildMathsNodes(), ...buildScienceNodes(), ...buildDigitalNodes()];
   }
   return _allNodes;
 }
